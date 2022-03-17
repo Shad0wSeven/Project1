@@ -4,18 +4,23 @@ import java.util.Queue;
 import java.util.Scanner;
 
 public class project1door {
-	static int xs = 0;
-	static int ys = 0;
-	static int xf = 0;
-	static int yf = 0;
-	static int a;
-	static int b;
-	static int c;
-	static boolean coordbased = false;
-	static boolean coordbasedout = false;
-	static Queue<Integer> xq = new LinkedList<Integer>();
-	static Queue<Integer> yq = new LinkedList<Integer>();
-	static int[][] map;
+	private static int xs = -1;
+	private static int ys = -1;
+	private static int xf = -1;
+	private static int yf = -1;
+	private static int yfs = -1;
+	private static int xfs = -1;
+	private static int a;
+	private static int b;
+	private static int c;
+	private static int xss = -1;
+	private static int yss = -1;
+	private static boolean coordbased = false;
+	private static boolean coordbasedout = false;
+	private static boolean time = false;
+	private static Queue<Integer> xq = new LinkedList<Integer>();
+	private static Queue<Integer> yq = new LinkedList<Integer>();
+	private static int[][] map;
 	// static ArrayList<Integer> path = new ArrayList<Integer>();
 
 	static int finalparams = 0;
@@ -24,11 +29,8 @@ public class project1door {
 		int mx = 1000;
 		int my = 1000;
 		int mv = 1000;
-		// System.out.println(x + " " + y);
-		if (map[x][y] == 1) {
-			// System.out.println(mapcopy);
-			return;
-		}
+		// System.out.println(x + " " + y);m
+		if (map[x][y] == 1) { return; }
 		if (y + 1 < map.length) {
 			if (map[x][y + 1] < mv && map[x][y + 1] > 0) {
 				mv = map[x][y + 1];
@@ -78,6 +80,8 @@ public class project1door {
 					System.out.print("C");
 				} else if (map[i][j] == -1) {
 					System.out.print("@");
+				} else if (map[i][j] == -4) {
+					System.out.print("|");
 				} else {
 					System.out.print(".");
 				}
@@ -87,8 +91,10 @@ public class project1door {
 	}
 
 	public static void pushDP(int x, int y) {
-		// System.out.println(x + " " + y);
-		if (map[y][x] == -3) {
+		// System.out.println(x + ":" + y);
+
+
+		if (map[y][x] == -3 || map[y][x] == -4) {
 			// System.out.println("FOUND");
 			xq.clear();
 			yq.clear();
@@ -101,7 +107,9 @@ public class project1door {
 		} else {
 			// push up
 			if (y + 1 < map[0].length) {
+				// System.out.println(map[x][y + 1] + "::" + (map[x][y] + 1));
 				if (map[x][y + 1] > map[x][y] + 1 && map[x][y + 1] > 0) {
+					// System.out.println("RIGHT");
 					map[x][y + 1] = map[x][y] + 1;
 					xq.add(x);
 					yq.add(y + 1);
@@ -110,7 +118,9 @@ public class project1door {
 			}
 
 			if (x + 1 < map.length) {
+	
 				if (map[x + 1][y] > map[x][y] + 1 && map[x + 1][y] > 0) {
+					// System.out.println("DOWN");
 					map[x + 1][y] = map[x][y] + 1;
 					xq.add(x + 1);
 					yq.add(y);
@@ -134,6 +144,7 @@ public class project1door {
 				}
 			}
 		}
+		// System.out.println(xq.size());
 
 		// System.out.println(x + ":" + y);
 	}
@@ -147,6 +158,8 @@ public class project1door {
 					System.out.println("+" + " " + i + " " + j);
 				} else if (map[i][j] == -3) {
 					System.out.println("C" + " " + i + " " + j);
+				} else if (map[i][j] == -4) {
+					System.out.println("|" + " " + i + " " + j);
 				} else if (map[i][j] == -1) {
 					System.out.println("@" + " " + i + " " + j);
 				} else {
@@ -159,8 +172,6 @@ public class project1door {
 	public static void project1main(File f) {
 
 		map = new int[1000][1000];
-		coordbased = false;
-		coordbasedout = false;
 
 		if (coordbased) {
 
@@ -170,6 +181,10 @@ public class project1door {
 				a = input.nextInt();
 				b = input.nextInt();
 				c = input.nextInt();
+
+				if (c == 2) {
+					a = a * 2;
+				}
 
 				for (int i = 0; i < a; i++) {
 					for (int j = 0; j < b; j++) {
@@ -188,9 +203,22 @@ public class project1door {
 						xf = j;
 						z = -3;
 					}
+
+					if (x == '|') {
+						yfs = i;
+
+						xfs = j;
+						z = -3;
+					}
 					if (x == 'K') {
-						ys = i;
-						xs = j;
+						if (ys == -1) {
+							ys = i;
+							xs = j;
+						} else {
+							yss = i;
+							xss = j;
+						}
+
 						z = 1;
 					}
 
@@ -217,6 +245,11 @@ public class project1door {
 				a = input.nextInt();
 				b = input.nextInt();
 				c = input.nextInt();
+
+				if (c == 2) {
+					a = a * 2;
+				}
+
 				// initialize array
 
 				for (int i = 0; i < a; i++) {
@@ -225,14 +258,28 @@ public class project1door {
 						char l = v.charAt(j);
 						int z = 0;
 						if (v.charAt(j) == 'C') {
+
+							z = -3;
+
 							yf = i;
 							xf = j;
-							z = -3;
+						}
+						if (v.charAt(j) == '|') {
+							z = -4;
+							yfs = i;
+							xfs = j;
+
 						}
 
 						if (v.charAt(j) == 'K') {
-							ys = i;
-							xs = j;
+							if (ys == -1) {
+								ys = i;
+								xs = j;
+							} else {
+								yss = i;
+								xss = j;
+							}
+
 							z = 1;
 						}
 
@@ -257,11 +304,37 @@ public class project1door {
 
 		xq.add(ys);
 		yq.add(xs);
+
+		for (int i = 0; i < a; i++) {
+			for (int j = 0; j < b; j++) {
+				System.out.print(map[i][j] + " ");
+			}
+			System.out.println("");
+		}
 		while (xq.size() != 0) {
 			pushDP(xq.remove(), yq.remove());
 		}
+
+		if (c == 2) {
+			// System.out.println("asdf");
+			xq.add(yss);
+			yq.add(xss);
+			while (xq.size() != 0) {
+				pushDP(xq.remove(), yq.remove());
+			}
+		}
+
+
+
 		drawMap(yf, xf);
 		map[yf][xf] = -3;
+
+		if (c == 2) {
+			drawMap(yfs, xfs);
+			map[yfs][xfs] = -4;
+		}
+
+
 		if (coordbasedout) {
 			printCoordMap();
 		} else {
@@ -270,10 +343,22 @@ public class project1door {
 	}
 
 	public static void main(String args[]) {
+		if(args.length > 0) {
+			// System.out.println(args[0]);
+			if(args[0].equalsIgnoreCase("--Help")) {
+				System.out.println("Welcome to Ayush's Pathfinder v1.0 \nThis program find the Cake for Kirby! \n\nCommand Line Arguments: \n--Stack: Uses Stack implementation (Default Off) \n--Queue: Uses Queue Implementation (Default On) \n--Opt: Finds optimal path (Default On) \n--Incoordinate: Uses Coordinate System to find path (Default Off) --Time: Prints runtime of program (Default Off) \n--Help: Prints this message");
+				System.exit(0);
+			}
+			
+		}
 
 		File x = new File("./src/map.txt");
-
+		long startTime = System.nanoTime();
 		project1main(x);
+		long endTime = System.nanoTime();
+		long totalTime = (endTime - startTime)/1000000;
+
+		System.out.println(totalTime);
 	}
 
 }
